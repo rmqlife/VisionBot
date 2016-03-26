@@ -1,6 +1,6 @@
 const int wheel[4]={11,10,9,8};
 const int velocityPin=12;
-const int MAXINT=32760;
+const long MAXINT=32760;
 void setup() {
   Serial.begin(9600);
   // put your setup code here, to run once:
@@ -45,14 +45,13 @@ void driveBoth(int ahead1,int ahead2)
 }
 
 int currentOrder = 4;
+
+
 int vLastStatus=0;
 int vInteval=0;
-
-int vIntevalOrder=0;
-long vIntevalSeqSum=0;
-const int vIntevalCOUNT=50;
-int vIntevalSeq[50];
-
+int vIntevalCount=0;
+int vIntevalSeq[100];
+int moveStatus=1;
 
 unsigned long time,lastTime;
 
@@ -81,13 +80,8 @@ void loop() {
   ///count velocity
   int vStatus=digitalRead(velocityPin);
   if (vStatus!=vLastStatus){
-    vIntevalOrder=(vIntevalOrder+1) % vIntevalCOUNT; 
-    vIntevalSeqSum=vIntevalSeqSum+vInteval-vIntevalSeq[vIntevalOrder];    
-    vIntevalSeq[vIntevalOrder]=vInteval;
-    //Serial.println(vIntevalSeqSum/vIntevalCOUNT);
-    
-    
-    
+    vIntevalSeq[vIntevalCount]=vInteval;
+    vIntevalCount++;
     vInteval=0;
     vLastStatus=vStatus;
   }else if (vInteval<MAXINT)
@@ -96,7 +90,23 @@ void loop() {
   
   ///time test
   if (millis()-lastTime==100){
-    Serial.println(millis());
     lastTime=millis();
+    long intSum=0;
+    vIntevalCount=vIntevalCount-vIntevalCount%2;
+    if (vIntevalCount>0){
+      for (int i=0;i<vIntevalCount;i++)
+        intSum=intSum+vIntevalSeq[i];
+      
+      int vAvg=intSum/vIntevalCount;
+      Serial.print(vIntevalCount);
+      Serial.print(' ');
+      Serial.println(vAvg);
+      moveStatus=1;
+      
+    }else if (moveStatus!=0){ //now is change to stop
+        Serial.println("stop");
+        moveStatus=0;  
+    } 
+    vIntevalCount=0;
   }
 }

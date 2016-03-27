@@ -1,6 +1,7 @@
 const int wheel[4]={11,10,9,8};
 const int velocityPin=12;
-const long MAXINT=32760;
+const int HOLE_NUMBER=20;
+
 void setup() {
   Serial.begin(9600);
   // put your setup code here, to run once:
@@ -8,6 +9,7 @@ void setup() {
    pinMode(wheel[i],OUTPUT);
  }
  pinMode(velocityPin,INPUT);
+ 
 }
 
 void driveSimple(int pinA,int pinB, int ahead)
@@ -38,14 +40,12 @@ void driveSimpleV(int pinA, int pinB, int ahead, int freqUp)
   else
        freq=0;
 }
-
-
 void driveSingle(int right,int ahead)
 {
   if (right>0) //right wheel
-    driveSimpleV(wheel[0],wheel[1],ahead,800);
+    driveSimple(wheel[0],wheel[1],ahead);
   else //left wheel
-    driveSimpleV(wheel[2],wheel[3],ahead,800);
+    driveSimple(wheel[2],wheel[3],ahead);
 }
 
 void driveBoth(int ahead1,int ahead2)
@@ -54,18 +54,6 @@ void driveBoth(int ahead1,int ahead2)
   driveSingle(1,ahead2);
 }
 
-
-
-
-
-int vLastStatus=0;
-int vInteval=0;
-int vIntevalCount=0;
-int vIntevalSeq[100];
-int moveStatus=1;
-
-unsigned long lastTime;
-
 int getCmd() {
   int currentOrder=-1; //wait
   if (Serial.available() > 0) {
@@ -73,7 +61,7 @@ int getCmd() {
                 int order = Serial.read()-48;
                 if (order>-1 && order<9){
                    currentOrder=order;
-                  Serial.print("I received: ");
+                  Serial.print("Command: ");
                   Serial.print(order,DEC);
                   Serial.print("   ");
                   Serial.print(currentOrder/3-1);
@@ -86,45 +74,60 @@ int getCmd() {
 
 
 int currentCmd=4;
+
+int vLastStatus=0;
+int vChangeCount=-1;
+double startMicros=0,endMicros=0;
+
+void resetVelocity()
+{
+  vChangeCount=-1;
+}
+
+void VelocityMeter()
+{
+  int vStatus=digitalRead(velocityPin);
+  if (vStatus!=vLastStatus){
+    vChangeCount++;
+    if (vChangeCount == 0) //tic
+      startMicros=micros();
+    else if (vChangeCount % 2==0 && vChangeCount>0 ) //toc
+       endMicros=micros();
+     vLastStatus=vStatus;
+  }
+}
+
+float getVelocity()
+{
+  int holesCount=vChangeCount/2;  
+  if (holesCount>0){
+      float rpm=60000000/((endMicros-startMicros)*HOLE_NUMBER/holesCount);
+      return rpm;
+  }
+  return 0;
+}
+
+
+
+
+
 void loop() {
-  //drive simple
+  //get command
   int cmd=getCmd();
   if (cmd>0)//legal command
     currentCmd=cmd;
-  
+  //drive motor by current command
   driveBoth(currentCmd / 3-1, currentCmd % 3 -1);
-
-  
-  ///count velocity
-  int vStatus=digitalRead(velocityPin);
-  if (vStatus!=vLastStatus){
-    vIntevalSeq[vIntevalCount]=vInteval;
-    vIntevalCount++;
-    vInteval=0;
-    vLastStatus=vStatus;
-  }else if (vInteval<MAXINT)
-    vInteval++;
-  
-  
-  ///time test
-  if (millis()-lastTime==100){
-    lastTime=millis();
-    long intSum=0;
-    vIntevalCount=vIntevalCount-vIntevalCount%2;
-    if (vIntevalCount>0){
-      for (int i=0;i<vIntevalCount;i++)
-        intSum=intSum+vIntevalSeq[i];
-      
-      int vAvg=intSum/vIntevalCount;
-      Serial.print(vIntevalCount);
-      Serial.print(' ');
-      Serial.println(vAvg);
-      moveStatus=1;
-      
-    }else if (moveStatus!=0){ //now is change to stop
-        Serial.println("stop");
-        moveStatus=0;  
-    } 
-    vIntevalCount=0;
+  ///velocity
+  VelocityMeter();
+ 
+  //show velocity every 100 millisec 
+  if (millis()%100 ==0){
+    float rpm=getVelocity();
+    if (rpm>0.1){
+      Serial.print("rpm: ");
+      Serial.println(rpm); //round per minute;
+    }
+    resetVelocity();
   }
 }

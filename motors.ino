@@ -28,18 +28,33 @@ void driveSimple(int pinA,int pinB, int ahead)
    }
 }
 
+
+
+int freq=0;
+const int freqUp=1000;
+const int freqTotal=1000;
 void driveSingle(int right,int ahead)
 {
-  if (right>0)
+  if (right>0) //right wheel
     driveSimple(wheel[0],wheel[1],ahead);
-  else
-    driveSimple(wheel[2],wheel[3],ahead);
+  else //left wheel
+  {
+    freq++;
+    if (freq<freqUp)
+      driveSimple(wheel[2],wheel[3],ahead);
+    else if (freq<freqTotal)
+      driveSimple(wheel[2],wheel[3],0);
+    else
+       freq=0;
+      
+  }
 }
 
 
 
 void driveBoth(int ahead1,int ahead2)
 {
+  
   driveSingle(-1,ahead1);
   driveSingle(1,ahead2);
 }
@@ -71,11 +86,13 @@ void loop() {
                 Serial.print(currentOrder/3-1);
                 Serial.print("   ");
                 Serial.print(currentOrder%3-1);
-                driveBoth(currentOrder / 3-1, currentOrder % 381);
-           
+
                 Serial.println();
 
   }
+  
+  driveBoth(currentOrder / 3-1, currentOrder % 3 -1);
+
   
   ///count velocity
   int vStatus=digitalRead(velocityPin);

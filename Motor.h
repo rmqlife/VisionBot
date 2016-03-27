@@ -3,15 +3,12 @@
 #include "Arduino.h"
 
 class Motor{
-	int pin[4];
-	int freq=0;
-	const int freqTotal=1000;
+	int pin[4]; 
 public:
-    Motor(int,int,int,int);
-	void driveSimple(int pinA,int pinB, int dir);
-	void driveSimpleV(int pinA, int pinB, int dir, int freqUp);
- 	void driveSingle(int right,int dir);
-	void driveBoth(int dir1,int dir2);
+        Motor(int,int,int,int);
+	void drive(int pinA,int pinB, int dir);
+	void drive(int pinA, int pinB, int dir, float freq);
+	void driveLR(int dir1,int dir2,float freq1,float freq2);
 };
 
 #endif

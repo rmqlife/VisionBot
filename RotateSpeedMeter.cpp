@@ -1,4 +1,12 @@
 #include "RotateSpeedMeter.h"
+RotateSpeedMeter::RotateSpeedMeter(int p0)
+{
+  pin=p0;
+  pinMode(pin,INPUT);
+  vChangeCount=-1;
+}
+
+
 void RotateSpeedMeter::reset()
 {
   vChangeCount=-1;

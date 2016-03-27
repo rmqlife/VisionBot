@@ -8,8 +8,9 @@ class RotateSpeedMeter
 	int vLastStatus=0;
 	int vChangeCount=-1;
 	double startMicros=0,endMicros=0;
+        int pin;
 public:
-	const int pin=12;
+        RotateSpeedMeter(int);
 	void reset();
 	void measure();
 	float rpm();

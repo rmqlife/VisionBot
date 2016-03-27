@@ -1,6 +1,7 @@
+#include "RotateSpeedMeter.h"
 const int wheel[4]={11,10,9,8};
-const int velocityPin=12;
-const int HOLE_NUMBER=20;
+
+RotateSpeedMeter  mspeed;
 
 void setup() {
   Serial.begin(9600);
@@ -8,8 +9,7 @@ void setup() {
  for (int i=0;i<4;i++){
    pinMode(wheel[i],OUTPUT);
  }
- pinMode(velocityPin,INPUT);
- 
+ pinMode(mspeed.pin,INPUT);
 }
 
 void driveSimple(int pinA,int pinB, int ahead)
@@ -54,6 +54,9 @@ void driveBoth(int ahead1,int ahead2)
   driveSingle(1,ahead2);
 }
 
+
+int currentCmd=4;
+
 int getCmd() {
   int currentOrder=-1; //wait
   if (Serial.available() > 0) {
@@ -72,45 +75,6 @@ int getCmd() {
  return currentOrder;
 }
 
-
-int currentCmd=4;
-
-int vLastStatus=0;
-int vChangeCount=-1;
-double startMicros=0,endMicros=0;
-
-void resetVelocity()
-{
-  vChangeCount=-1;
-}
-
-void VelocityMeter()
-{
-  int vStatus=digitalRead(velocityPin);
-  if (vStatus!=vLastStatus){
-    vChangeCount++;
-    if (vChangeCount == 0) //tic
-      startMicros=micros();
-    else if (vChangeCount % 2==0 && vChangeCount>0 ) //toc
-       endMicros=micros();
-     vLastStatus=vStatus;
-  }
-}
-
-float getVelocity()
-{
-  int holesCount=vChangeCount/2;  
-  if (holesCount>0){
-      float rpm=60000000/((endMicros-startMicros)*HOLE_NUMBER/holesCount);
-      return rpm;
-  }
-  return 0;
-}
-
-
-
-
-
 void loop() {
   //get command
   int cmd=getCmd();
@@ -119,15 +83,15 @@ void loop() {
   //drive motor by current command
   driveBoth(currentCmd / 3-1, currentCmd % 3 -1);
   ///velocity
-  VelocityMeter();
+  mspeed.measure();
  
-  //show velocity every 100 millisec 
+  //show velocity every 100 millisecond 
   if (millis()%100 ==0){
-    float rpm=getVelocity();
+    float rpm=mspeed.rpm();
     if (rpm>0.1){
       Serial.print("rpm: ");
       Serial.println(rpm); //round per minute;
     }
-    resetVelocity();
+    mspeed.reset();
   }
 }

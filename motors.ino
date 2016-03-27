@@ -12,13 +12,11 @@ void setup() {
 
 void driveSimple(int pinA,int pinB, int ahead)
 {
-  if (ahead>0)
-  {
+  if (ahead>0){
     digitalWrite(pinA,HIGH);
     digitalWrite(pinB,LOW);
    }
-   else if (ahead==0)
-   {
+   else if (ahead==0){
      digitalWrite(pinA,LOW);
      digitalWrite(pinB,LOW);
    }
@@ -28,38 +26,36 @@ void driveSimple(int pinA,int pinB, int ahead)
    }
 }
 
-
-
 int freq=0;
-const int freqUp=1000;
 const int freqTotal=1000;
-void driveSingle(int right,int ahead)
+void driveSimpleV(int pinA, int pinB, int ahead, int freqUp)
 {
-  if (right>0) //right wheel
-    driveSimple(wheel[0],wheel[1],ahead);
-  else //left wheel
-  {
-    freq++;
-    if (freq<freqUp)
-      driveSimple(wheel[2],wheel[3],ahead);
-    else if (freq<freqTotal)
-      driveSimple(wheel[2],wheel[3],0);
-    else
+  freq++;
+  if (freq<freqUp)
+      driveSimple(pinA,pinB,ahead);
+  else if (freq<freqTotal)
+      driveSimple(pinA,pinB,0);
+  else
        freq=0;
-      
-  }
 }
 
 
+void driveSingle(int right,int ahead)
+{
+  if (right>0) //right wheel
+    driveSimpleV(wheel[0],wheel[1],ahead,800);
+  else //left wheel
+    driveSimpleV(wheel[2],wheel[3],ahead,800);
+}
 
 void driveBoth(int ahead1,int ahead2)
 {
-  
   driveSingle(-1,ahead1);
   driveSingle(1,ahead2);
 }
 
-int currentOrder = 4;
+
+
 
 
 int vLastStatus=0;
@@ -68,30 +64,35 @@ int vIntevalCount=0;
 int vIntevalSeq[100];
 int moveStatus=1;
 
-unsigned long time,lastTime;
+unsigned long lastTime;
 
-
-void loop() {
-  // send data only when you receive data:
-   if (Serial.available() > 0) {
+int getCmd() {
+  int currentOrder=-1; //wait
+  if (Serial.available() > 0) {
                 // read the incoming byte:
                 int order = Serial.read()-48;
-                // say what you got:
-                Serial.print("I received: ");
-                Serial.print(order,DEC);
-                Serial.print("   ");
-
-                if (order>-1 && order<9)
+                if (order>-1 && order<9){
                    currentOrder=order;
-                Serial.print(currentOrder/3-1);
-                Serial.print("   ");
-                Serial.print(currentOrder%3-1);
-
-                Serial.println();
-
+                  Serial.print("I received: ");
+                  Serial.print(order,DEC);
+                  Serial.print("   ");
+                  Serial.print(currentOrder/3-1);
+                  Serial.print("   ");
+                  Serial.println(currentOrder%3-1);
+                }
   }
+ return currentOrder;
+}
+
+
+int currentCmd=4;
+void loop() {
+  //drive simple
+  int cmd=getCmd();
+  if (cmd>0)//legal command
+    currentCmd=cmd;
   
-  driveBoth(currentOrder / 3-1, currentOrder % 3 -1);
+  driveBoth(currentCmd / 3-1, currentCmd % 3 -1);
 
   
   ///count velocity

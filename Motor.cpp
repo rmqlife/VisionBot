@@ -41,8 +41,8 @@ void Motor::drive(int pinA, int pinB, int dir, float freq)
    }
 }
 
-void Motor::driveLR(int dir1,int dir2,float freq1,float freq2)
+void Motor::driveLR(int dirL,int dirR,float freqL,float freqR)
 {
-  drive(pin[2],pin[3],dir1,freq1); //Left wheel
-  drive(pin[0],pin[1],dir2,freq2); //Right wheel
+  drive(pin[0],pin[1],dirL,freqL); //Left wheel
+  drive(pin[2],pin[3],dirR,freqR); //Right wheel
 }

@@ -34,3 +34,4 @@ float RotateSpeedMeter::rpm()
   }
   return 0;
 }
+

@@ -1,48 +1,67 @@
 #include "Motor.h"
-
-Motor::Motor(int p0,int p1,int p2,int p3){
- pin[0]=p0;
- pin[1]=p1;
- pin[2]=p2;
- pin[3]=p3;
- for (int i=0;i<4;i++)
-   pinMode(pin[i],OUTPUT);
+void Motor::init(int p0,int p1){
+  pin[0]=p0;
+  pin[1]=p1;
+  pinMode(pin[0],OUTPUT);
+  pinMode(pin[1],OUTPUT);
 }
 
-void Motor::drive(int pinA,int pinB, int dir)
+
+
+void Motor::drive(int dir)
 {
   if (dir>0){
-    digitalWrite(pinA,HIGH);
-    digitalWrite(pinB,LOW);
+    analogWrite(pin[0],freq*255);
+    digitalWrite(pin[1],LOW);
    }
    else if (dir==0){
-     digitalWrite(pinA,LOW);
-     digitalWrite(pinB,LOW);
+     digitalWrite(pin[0],LOW);
+     digitalWrite(pin[1],LOW);
    }
    else {
-     digitalWrite(pinA,LOW);
-     digitalWrite(pinB,HIGH);
+     digitalWrite(pin[0],LOW);
+     analogWrite(pin[1],freq*255);
    }
 }
 
-void Motor::drive(int pinA, int pinB, int dir, float freq)
+
+int Motor::updateFreq(float observedRPM)
 {
-  if (dir>0){
-    analogWrite(pinA,freq*255);
-    digitalWrite(pinB,LOW);
-   }
-   else if (dir==0){
-     digitalWrite(pinA,LOW);
-     digitalWrite(pinB,LOW);
-   }
-   else {
-     digitalWrite(pinA,LOW);
-     analogWrite(pinB,freq*255);
-   }
+  if (abs(rpm - observedRPM) > rpm * tolerate) //can not tolerate, need to update
+  {
+    if (observedRPM>0.1){// can not divide by 0
+      float freqUpdate = freq * rpm / observedRPM;
+      if (freqUpdate < 1.0){
+        freq = freqUpdate;
+        return 0;// success
+      }
+    }
+    freq=1.0;
+    return 1;//restart motor
+  }
+  return -1; //not need to update
 }
 
-void Motor::driveLR(int dirL,int dirR,float freqL,float freqR)
+void Motor::driveFeedback(int dir, float observedRPM)
 {
-  drive(pin[0],pin[1],dirL,freqL); //Left wheel
-  drive(pin[2],pin[3],dirR,freqR); //Right wheel
+  if (abs(dir)==0){//command to stop
+    drive(dir);
+  } else{ // forward or backward, need to update frequency
+    updateFreq(observedRPM);
+    drive(dir);
+  }
 }
+
+MotorSet::MotorSet(int pin0,int pin1,int pin2,int pin3)
+{
+  motorL.init(pin0,pin1);
+  motorR.init(pin2,pin3);
+}
+
+void MotorSet::driveFeedback(int dirL,float observedRPML,int dirR,float observedRPMR)
+{
+  motorL.driveFeedback(dirL,observedRPML); //Left wheel
+  motorR.driveFeedback(dirR,observedRPMR); //Right wheel
+}
+
+

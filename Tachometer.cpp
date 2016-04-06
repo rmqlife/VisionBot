@@ -1,5 +1,5 @@
-#include "RotateSpeedMeter.h"
-RotateSpeedMeter::RotateSpeedMeter(int p0)
+#include "Tachometer.h"
+Tachometer::Tachometer(int p0)
 {
   pin=p0;
   pinMode(pin,INPUT);
@@ -7,12 +7,12 @@ RotateSpeedMeter::RotateSpeedMeter(int p0)
 }
 
 
-void RotateSpeedMeter::reset()
+void Tachometer::reset()
 {
   vChangeCount=-1;
 }
 
-void RotateSpeedMeter::measure()
+void Tachometer::measure()
 {
   int vStatus=digitalRead(pin);
   if (vStatus!=vLastStatus){
@@ -25,7 +25,7 @@ void RotateSpeedMeter::measure()
   }
 }
 
-float RotateSpeedMeter::rpm()
+float Tachometer::rpm()
 {
   int holesCount=vChangeCount/2;  
   if (holesCount>0){

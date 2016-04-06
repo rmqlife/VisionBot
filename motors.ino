@@ -1,12 +1,12 @@
-#include "RotateSpeedMeter.h"
+#include "Tachometer.h"
 #include "Motor.h"
 #include "Ultrasonic.h"
 #include "GY_85.h"
 #include <Wire.h>
 
 bool debug=1;
-RotateSpeedMeter speedL(8); //left
-RotateSpeedMeter speedR(7); //right
+Tachometer speedL(8); //left
+Tachometer speedR(7); //right
 MotorSet motorSet(9,6,11,10);//(11, 10, 9, 6);
 Ultrasonic ultrasonic(4,5); // trig echo
 GY_85 GY85;     //A5->scl A4->sda

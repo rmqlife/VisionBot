@@ -1,8 +1,8 @@
-#ifndef RotateSpeedMeter_h 
-#define RotateSpeedMeter_h
+#ifndef Tachometer_h 
+#define Tachometer_h
 #include "Arduino.h"
 
-class RotateSpeedMeter
+class Tachometer
 {
 	const int HOLE_NUMBER=20;
 	int vLastStatus=0;
@@ -10,7 +10,7 @@ class RotateSpeedMeter
 	double startMicros=0,endMicros=0;
         int pin;
 public:
-        RotateSpeedMeter(int);
+        Tachometer(int);
 	void reset();
 	void measure();
 	float rpm();

@@ -66,13 +66,17 @@ void testGy(){
 //    Serial.print  ( " z:" );
 //    Serial.print  ( az );
 //    
-    Serial.print  ( "  compass" );
-    Serial.print  ( " x:" );
-    Serial.print  ( cx );
-    Serial.print  ( " y:" );
-    Serial.print  ( cy );
-    Serial.print  (" z:");
-    Serial.println  ( cz );
+    Serial.print("compass" );
+    float yaw=atan2(cy,cx);
+    if (yaw<0)
+      yaw+=2*PI;
+    if (yaw>2*PI)
+      yaw-=2*PI;
+    yaw=yaw*180/PI;
+    Serial.print(yaw);
+    Serial.print("\n");
+    
+    
 //    
 //    Serial.print  ( "  gyro" );
 //    Serial.print  ( " x:" );
@@ -117,7 +121,7 @@ void loop() {
 //    }
   }
   
-  if (millis()/100 != timerUs){
+  if (millis()/500 != timerUs){
       timerUs=millis()/500;
       float distFront=ultrasonic.Ranging(CM);
       if (distFront<20 && false){

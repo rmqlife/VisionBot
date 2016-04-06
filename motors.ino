@@ -51,18 +51,18 @@ bool abnormalStatus(int cmdDirL,int cmdDirR,float rpmL,float rpmR)
 }
 
 void testGy(){
-    int ax = GY85.accelerometer_x( GY85.readFromAccelerometer() );
-    int ay = GY85.accelerometer_y( GY85.readFromAccelerometer() );
-    int az = GY85.accelerometer_z( GY85.readFromAccelerometer() );
+//    int ax = GY85.accelerometer_x( GY85.readFromAccelerometer() );
+//    int ay = GY85.accelerometer_y( GY85.readFromAccelerometer() );
+//    int az = GY85.accelerometer_z( GY85.readFromAccelerometer() );
     
     int cx = GY85.compass_x( GY85.readFromCompass() );
     int cy = GY85.compass_y( GY85.readFromCompass() );
     int cz = GY85.compass_z( GY85.readFromCompass() );
 
-    float gx = GY85.gyro_x( GY85.readGyro() );
-    float gy = GY85.gyro_y( GY85.readGyro() );
-    float gz = GY85.gyro_z( GY85.readGyro() );
-    float gt = GY85.temp  ( GY85.readGyro() );
+//    float gx = GY85.gyro_x( GY85.readGyro() );
+//    float gy = GY85.gyro_y( GY85.readGyro() );
+//    float gz = GY85.gyro_z( GY85.readGyro() );
+//    float gt = GY85.temp  ( GY85.readGyro() );
 //    
 //    Serial.print  ( "accelerometer" );
 //    Serial.print  ( " x:" );
@@ -95,11 +95,14 @@ void testGy(){
 //    Serial.println( gt );
 }
 
-
+#define CIRCLE_SPEED 100
+#define CIRCLE_GYRO 100
 
 unsigned long timerSpeed=0;
-unsigned long timerUs=0;
+unsigned long timerGyro=0; 
 unsigned long timerCmd=0;
+
+
 void loop() {
   //get command
   int cmd = getCmd();
@@ -114,8 +117,8 @@ void loop() {
   speedR.measure();
   speedL.measure();
   //show velocity every 100 millisecond
-  if (millis() / 100 != timerSpeed) {
-    timerSpeed=millis()/100;
+  if (millis() / CIRCLE_SPEED != timerSpeed) {
+    timerSpeed=millis()/CIRCLE_SPEED;
     float rpmR = speedR.rpm();
     float rpmL = speedL.rpm();
     
@@ -128,16 +131,16 @@ void loop() {
     speedR.reset(); //reset the speedMeter's time circle
     speedL.reset();
     
-    if (rpmR > 0.1 || rpmL > 0.1) {
-      Serial.print(rpmL);
-      Serial.print("\t");
-      Serial.print(rpmR); //round per minute;
-      Serial.print("\n");
-    }
+//    if (rpmR > 0.1 || rpmL > 0.1) {
+//      Serial.print(rpmL);
+//      Serial.print("\t");
+//      Serial.print(rpmR); //round per minute;
+//      Serial.print("\n");
+//    }
   }
   
-  if (millis()/500 != timerUs){
-      timerUs=millis()/500;
+  if (millis()/CIRCLE_GYRO != timerGyro){
+      timerGyro=millis()/CIRCLE_GYRO;
       float distFront=ultrasonic.Ranging(CM);
       if (distFront<20 && false){
           currentCmd=4;

@@ -11,7 +11,8 @@ MotorSet motorSet(9,6,11,10);//(11, 10, 9, 6);
 Ultrasonic ultrasonic(4,5); // trig echo
 GY_85 GY85;     //A5->scl A4->sda
 
-
+#define MAX_TOLERANT_STARTUP_MILLIS 500
+#define RPM_EQUALS_STOP 50
 
 void setup() {
     Wire.begin();
@@ -42,6 +43,11 @@ int getCmd() {
     }
   }
   return currentOrder;
+}
+
+bool abnormalStatus(int cmdDirL,int cmdDirR,float rpmL,float rpmR)
+{
+    return  (cmdDirL!=0 && rpmL<RPM_EQUALS_STOP ) || (cmdDirR!=0 && rpmR<RPM_EQUALS_STOP) ;
 }
 
 void testGy(){
@@ -93,13 +99,15 @@ void testGy(){
 
 unsigned long timerSpeed=0;
 unsigned long timerUs=0;
+unsigned long timerCmd=0;
 void loop() {
   //get command
   int cmd = getCmd();
   if (cmd >= 0){ //legal command
     currentCmd = cmd;
     //drive motor by current command
-    motorSet.driveFeedback(currentCmd / 3 - 1,0,currentCmd % 3 - 1,0);
+    motorSet.drive(currentCmd / 3 - 1,currentCmd % 3 - 1); //skip the update procedure when start
+    timerCmd=millis();
   }
   
   ///velocity
@@ -110,15 +118,22 @@ void loop() {
     timerSpeed=millis()/100;
     float rpmR = speedR.rpm();
     float rpmL = speedL.rpm();
+    
+    if (abs(millis()-timerCmd)>MAX_TOLERANT_STARTUP_MILLIS && abnormalStatus(currentCmd / 3 - 1,currentCmd % 3 - 1,rpmL,rpmR))
+    {
+       currentCmd=4;//sets a stop signal
+    }
+    
     motorSet.driveFeedback(currentCmd / 3 - 1,rpmL,currentCmd % 3 - 1,rpmR);
-    speedR.reset();
+    speedR.reset(); //reset the speedMeter's time circle
     speedL.reset();
-//    if (rpmR > 0.1 || rpmL > 0.1) {
-//      Serial.print(rpmL);
-//      Serial.print("\t");
-//      Serial.print(rpmR); //round per minute;
-//      Serial.print("\n");
-//    }
+    
+    if (rpmR > 0.1 || rpmL > 0.1) {
+      Serial.print(rpmL);
+      Serial.print("\t");
+      Serial.print(rpmR); //round per minute;
+      Serial.print("\n");
+    }
   }
   
   if (millis()/500 != timerUs){
@@ -128,7 +143,7 @@ void loop() {
           currentCmd=4;
           motorSet.driveFeedback(currentCmd / 3 - 1,0,currentCmd % 3 - 1,0);
       }
-      testGy();
+//      testGy();
   }
 }
 

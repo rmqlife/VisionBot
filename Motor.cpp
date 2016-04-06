@@ -64,5 +64,9 @@ void MotorSet::driveFeedback(int dirL,float observedRPML,int dirR,float observed
   motorR.driveFeedback(dirR,observedRPMR); //Right wheel
 }
 
+void MotorSet::drive(int dirL,int dirR)
+{
+  motorL.drive(dirL);  
+}
 
 

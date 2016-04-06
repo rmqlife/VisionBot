@@ -5,14 +5,27 @@
 #include <Wire.h>
 
 bool debug=1;
-Tachometer speedL(8); //left
-Tachometer speedR(7); //right
+Tachometer speedL(2); //left
+Tachometer speedR(3); //right
 MotorSet motorSet(9,6,11,10);//(11, 10, 9, 6);
 Ultrasonic ultrasonic(4,5); // trig echo
 GY_85 GY85;     //A5->scl A4->sda
 
 #define MAX_TOLERANT_STARTUP_MILLIS 500
 #define RPM_EQUALS_STOP 50
+
+void tachoAdderR(){
+  speedR.adder();  
+}
+
+void tachoAdderL(){
+  speedL.adder();
+}
+
+void tachoStart(){
+    attachInterrupt(speedR.getPin()-2,tachoAdderR,RISING);
+    attachInterrupt(speedL.getPin()-2,tachoAdderL,RISING);
+}
 
 void setup() {
     Wire.begin();
@@ -21,6 +34,7 @@ void setup() {
     delay(10);
     GY85.init();
     delay(10);
+    tachoStart();
 }
 
 int currentCmd = 4;
@@ -54,16 +68,9 @@ void testGy(){
 //    int ax = GY85.accelerometer_x( GY85.readFromAccelerometer() );
 //    int ay = GY85.accelerometer_y( GY85.readFromAccelerometer() );
 //    int az = GY85.accelerometer_z( GY85.readFromAccelerometer() );
-    
     int cx = GY85.compass_x( GY85.readFromCompass() );
     int cy = GY85.compass_y( GY85.readFromCompass() );
     int cz = GY85.compass_z( GY85.readFromCompass() );
-
-//    float gx = GY85.gyro_x( GY85.readGyro() );
-//    float gy = GY85.gyro_y( GY85.readGyro() );
-//    float gz = GY85.gyro_z( GY85.readGyro() );
-//    float gt = GY85.temp  ( GY85.readGyro() );
-//    
 //    Serial.print  ( "accelerometer" );
 //    Serial.print  ( " x:" );
 //    Serial.print  ( ax );
@@ -81,18 +88,6 @@ void testGy(){
     yaw=yaw*180/PI;
     Serial.print(yaw);
     Serial.print("\n");
-    
-    
-//    
-//    Serial.print  ( "  gyro" );
-//    Serial.print  ( " x:" );
-//    Serial.print  ( gx );
-//    Serial.print  ( " y:" );
-//    Serial.print  ( gy );
-//    Serial.print  ( " z:" );
-//    Serial.print  ( gz );
-//    Serial.print  ( " gyro temp:" );
-//    Serial.println( gt );
 }
 
 #define CIRCLE_SPEED 100
@@ -113,30 +108,28 @@ void loop() {
     timerCmd=millis();
   }
   
-  ///velocity
-  speedR.measure();
-  speedL.measure();
-  //show velocity every 100 millisecond
+  //measure RPM every 100 millisecond
   if (millis() / CIRCLE_SPEED != timerSpeed) {
     timerSpeed=millis()/CIRCLE_SPEED;
     float rpmR = speedR.rpm();
     float rpmL = speedL.rpm();
-    
-    if (abs(millis()-timerCmd)>MAX_TOLERANT_STARTUP_MILLIS && abnormalStatus(currentCmd / 3 - 1,currentCmd % 3 - 1,rpmL,rpmR))
-    {
-       currentCmd=4;//sets a stop signal
-    }
-    
-    motorSet.driveFeedback(currentCmd / 3 - 1,rpmL,currentCmd % 3 - 1,rpmR);
     speedR.reset(); //reset the speedMeter's time circle
     speedL.reset();
     
-//    if (rpmR > 0.1 || rpmL > 0.1) {
-//      Serial.print(rpmL);
-//      Serial.print("\t");
-//      Serial.print(rpmR); //round per minute;
-//      Serial.print("\n");
+//    if (abs(millis()-timerCmd)>MAX_TOLERANT_STARTUP_MILLIS && abnormalStatus(currentCmd / 3 - 1,currentCmd % 3 - 1,rpmL,rpmR))
+//    {
+//       currentCmd=4;//sets a stop signal
 //    }
+    
+    motorSet.driveFeedback(currentCmd / 3 - 1,rpmL,currentCmd % 3 - 1,rpmR);
+
+    
+    if (rpmR > 0.1 || rpmL > 0.1) {
+      Serial.print(rpmL);
+      Serial.print("\t");
+      Serial.print(rpmR); //round per minute;
+      Serial.print("\n");
+    }
   }
   
   if (millis()/CIRCLE_GYRO != timerGyro){

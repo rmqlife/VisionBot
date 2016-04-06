@@ -2,32 +2,33 @@
 Tachometer::Tachometer(int p0)
 {
   pin=p0;
-  pinMode(pin,INPUT);
-  vChangeCount=-1;
+  vChangeCount=0;
+}
+
+int Tachometer::getPin(){
+  return pin;
 }
 
 
-void Tachometer::reset()
-{
-  vChangeCount=-1;
+void Tachometer::reset(){
+	vChangeCount=0;
 }
 
-void Tachometer::measure()
+
+void Tachometer::adder()
 {
-  int vStatus=digitalRead(pin);
-  if (vStatus!=vLastStatus){
-    vChangeCount++;
-    if (vChangeCount == 0) //tic
-      startMicros=micros();
-    else if (vChangeCount % 2==0 && vChangeCount>0 ) //toc
-       endMicros=micros();
-     vLastStatus=vStatus;
+  vChangeCount++;
+  if (vChangeCount==1){ //first change
+  	startMicros=micros();
   }
+  else
+  	endMicros=micros();
 }
+
 
 float Tachometer::rpm()
 {
-  int holesCount=vChangeCount/2;  
+  int holesCount=vChangeCount-1;  
   if (holesCount>0){
       float rpm=60000000/((endMicros-startMicros)*HOLE_NUMBER/holesCount);
       return rpm;

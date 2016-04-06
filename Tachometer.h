@@ -5,15 +5,15 @@
 class Tachometer
 {
 	const int HOLE_NUMBER=20;
-	int vLastStatus=0;
 	int vChangeCount=-1;
 	double startMicros=0,endMicros=0;
-        int pin;
+  int pin;
 public:
-        Tachometer(int);
-	void reset();
-	void measure();
+  void adder();
+  Tachometer(int);
+  void reset();
 	float rpm();
+  int getPin();
 };
 
 #endif

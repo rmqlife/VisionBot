@@ -6,9 +6,7 @@ void Motor::init(int p0,int p1){
   pinMode(pin[1],OUTPUT);
 }
 
-
-
-void Motor::drive(int dir)
+void Motor::drive(int dir,float freq)
 {
   if (dir>0){
     analogWrite(pin[0],freq*255);
@@ -25,49 +23,21 @@ void Motor::drive(int dir)
 }
 
 
-int Motor::updateFreq(float observedRPM)
-{
-  if (abs(rpm - observedRPM) > rpm * tolerate) //can not tolerate, need to update
-  {
-    if (observedRPM>0.1){// can not divide by 0
-      float freqUpdate = freq * rpm / observedRPM;
-      if (freqUpdate < 1.0){
-        freq = freqUpdate;
-        return 0;// success
-      }
-    }
-    freq=1.0;
-    return 1;//restart motor
-  }
-  return -1; //not need to update
-}
-
-void Motor::driveFeedback(int dir, float observedRPM)
-{
-  if (abs(dir)==0){//command to stop
-    drive(dir);
-  } else{ // forward or backward, need to update frequency
-    updateFreq(observedRPM);
-    drive(dir);
-  }
-}
-
 MotorSet::MotorSet(int pin0,int pin1,int pin2,int pin3)
 {
   motorL.init(pin0,pin1);
   motorR.init(pin2,pin3);
 }
 
-void MotorSet::driveFeedback(int dirL,float observedRPML,int dirR,float observedRPMR)
+void MotorSet::drive(int dirL,float freqL,int dirR,float freqR)
 {
-  motorL.driveFeedback(dirL,observedRPML); //Left wheel
-  motorR.driveFeedback(dirR,observedRPMR); //Right wheel
+  motorL.drive(dirL,freqL); //Left wheel
+  motorR.drive(dirR,freqR); //Right wheel
 }
 
-void MotorSet::drive(int dirL,int dirR)
+void MotorSet::driveCmd(Cmd cmd)
 {
-  motorL.drive(dirL);  
-  motorR.drive(dirR);
+  if (cmd.type==KEEP_STATUS){
+    drive(cmd.dirL,cmd.freqL,cmd.dirR,cmd.freqR);
+  }
 }
-
-

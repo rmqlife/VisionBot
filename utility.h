@@ -5,7 +5,7 @@
 #define MAX_TOLERANT_STARTUP_MILLIS 500
 #define RPM_EQUALS_STOP 50
 // time circles in millisecond
-#define CIRCLE_SPEED 100
+#define CIRCLE_SPEED 200
 #define CIRCLE_GYRO 100
 
 #define KEEP_STATUS 2

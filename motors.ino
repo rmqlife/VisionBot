@@ -14,6 +14,13 @@ GY_85 GY85;     //A5->scl A4->sda
 #define MAX_TOLERANT_STARTUP_MILLIS 500
 #define RPM_EQUALS_STOP 50
 
+#define CIRCLE_SPEED 200
+#define CIRCLE_GYRO 100
+
+unsigned long timerSpeed=0;
+unsigned long timerGyro=0; 
+unsigned long timerCmd=0;
+
 void tachoAdderR(){
   speedR.adder();  
 }
@@ -90,14 +97,6 @@ void testGy(){
     Serial.print("\n");
 }
 
-#define CIRCLE_SPEED 100
-#define CIRCLE_GYRO 100
-
-unsigned long timerSpeed=0;
-unsigned long timerGyro=0; 
-unsigned long timerCmd=0;
-
-
 void loop() {
   //get command
   int cmd = getCmd();
@@ -113,8 +112,7 @@ void loop() {
     timerSpeed=millis()/CIRCLE_SPEED;
     float rpmR = speedR.rpm();
     float rpmL = speedL.rpm();
-    speedR.reset(); //reset the speedMeter's time circle
-    speedL.reset();
+
     
 //    if (abs(millis()-timerCmd)>MAX_TOLERANT_STARTUP_MILLIS && abnormalStatus(currentCmd / 3 - 1,currentCmd % 3 - 1,rpmL,rpmR))
 //    {
@@ -122,14 +120,15 @@ void loop() {
 //    }
     
     motorSet.driveFeedback(currentCmd / 3 - 1,rpmL,currentCmd % 3 - 1,rpmR);
-
-    
+//    motorSet.drive(currentCmd / 3 - 1,currentCmd % 3 - 1);  
     if (rpmR > 0.1 || rpmL > 0.1) {
       Serial.print(rpmL);
       Serial.print("\t");
       Serial.print(rpmR); //round per minute;
       Serial.print("\n");
     }
+    speedR.reset(); //reset the speedMeter's time circle
+    speedL.reset();
   }
   
   if (millis()/CIRCLE_GYRO != timerGyro){

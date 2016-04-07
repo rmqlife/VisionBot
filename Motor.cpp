@@ -67,6 +67,7 @@ void MotorSet::driveFeedback(int dirL,float observedRPML,int dirR,float observed
 void MotorSet::drive(int dirL,int dirR)
 {
   motorL.drive(dirL);  
+  motorR.drive(dirR);
 }
 
 

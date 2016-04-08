@@ -38,8 +38,8 @@ void setup() {
     GY85.init();
     delay(10);
     tachoStart();
-
-    currentCmd.findDirection(180);
+    
+    currentCmd.findDirection(compass()+10);
 }
 
 float compass()

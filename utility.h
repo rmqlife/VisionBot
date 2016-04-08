@@ -16,4 +16,6 @@
 
 float feedbackFreq(float rpm,float feedback,float freq);
 
+float degreeAdd(float da,float db);
+
 #endif

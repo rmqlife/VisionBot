@@ -96,15 +96,23 @@ void Cmd::updateFreq(float feedbackL,float feedbackR,bool obeyFag){
 }
 
 void Cmd::updateDir(float feedbackDegree){
-  if (abs(degree-feedbackDegree)<5){
+  float clockwiseDelta=feedbackDegree-degree;
+  if (clockwiseDelta<0)
+    clockwiseDelta+=360;
+  if (clockwiseDelta>180){
+    clockwiseDelta=clockwiseDelta-360;  
+  }
+  if (abs(clockwiseDelta)<3){
     motorCmd.setDir(0,0);
     return;
   }
-  else if (feedbackDegree>degree)
+  if (clockwiseDelta>0) //clockwiseDelta is positive, clockwise turn, turn right
     motorCmd.setDir(1,-1);
-  else 
+  else //clockwiseDelta is negative, counterclockwise turn, which means turn left
     motorCmd.setDir(-1,1);
-  motorCmd.setTimeout(50);
+
+  float strength=abs(clockwiseDelta)/180;
+  motorCmd.setTimeout(50*strength+50);
 }
 
 void Cmd::findDirection(float degree)
@@ -113,3 +121,5 @@ void Cmd::findDirection(float degree)
   this->degree=degree;
   this->type=FIND_DIRECTION;  
 }
+
+

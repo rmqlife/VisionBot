@@ -37,5 +37,13 @@ void MotorSet::drive(int dirL,float freqL,int dirR,float freqR)
 
 void MotorSet::driveCmd(Cmd &cmd)
 {
-    drive(cmd.dirL,cmd.freqL,cmd.dirR,cmd.freqR);
+  MotorCmd mc=cmd.motorCmd;
+  if (mc.available())
+    drive(mc.dirL,mc.freqL,mc.dirR,mc.freqR);
+  else
+    setStop();
+}
+
+void MotorSet::setStop(){
+  drive(0,0,0,0);  
 }

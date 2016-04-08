@@ -38,6 +38,8 @@ void setup() {
     GY85.init();
     delay(10);
     tachoStart();
+
+    currentCmd.findDirection(180);
 }
 
 float compass()
@@ -55,15 +57,12 @@ float compass()
 }
 
 void loop() {
-    currentCmd.type=FIND_DIRECTION;//KEEP_STATUS;
-    currentCmd.degree=180;
-    currentCmd.freqL=1;
-    currentCmd.freqR=1;
   //get command
   if (currentCmd.getCmd() >= 0){ //legal command
     //drive motor by current command
     motorSet.driveCmd(currentCmd); 
   }
+  
   //measure tacho by tachometer and feedback control
   if (millis() / CIRCLE_SPEED != timerSpeed) {
     timerSpeed=millis()/CIRCLE_SPEED;
@@ -77,8 +76,7 @@ void loop() {
     if (show_rpm && (feedbackR > 0.1 || feedbackL > 0.1)) {
       Serial.print(feedbackL);
       Serial.print("\t");
-      Serial.print(feedbackR); //round per minute;
-      Serial.print("\n");
+      Serial.println(feedbackR); //round per minute;
     }
     speedR.reset(); //reset the speedMeter's time circle
     speedL.reset();
@@ -87,30 +85,15 @@ void loop() {
   //gyroscope
   if (millis()/CIRCLE_GYRO != timerGyro){
       timerGyro=millis()/CIRCLE_GYRO;
-
       // ultrasonic
       float distFront=ultrasonic.Ranging(CM);
-      if (distFront<20 && false){
-          currentCmd.setStop();
-          motorSet.driveCmd(currentCmd);
-      }
-
+      if (distFront<20 && false)
+          currentCmd.keepStatus(0,0);
       //compass
       float d=compass();
       if (currentCmd.type==FIND_DIRECTION)
-      {
           currentCmd.updateDir(d);
-          motorSet.driveCmd(currentCmd);
-      }
   }
-
-  if (currentCmd.type==FIND_DIRECTION && millis()/CIRCLE_CHECK != timerCheck){
-    timerCheck=millis()/CIRCLE_CHECK;
-    currentCmd.setStop();
-    motorSet.driveCmd(currentCmd);
-  }
-  
-  
-  Serial.println(currentCmd.type);
+  motorSet.driveCmd(currentCmd);
 }
 

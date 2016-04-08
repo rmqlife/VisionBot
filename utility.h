@@ -7,6 +7,7 @@
 // time circles in millisecond
 #define CIRCLE_SPEED 200
 #define CIRCLE_GYRO 100
+#define CIRCLE_CHECK 70
 
 #define KEEP_STATUS 2
 #define FEEDBACK_CONTROL 4

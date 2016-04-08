@@ -35,9 +35,7 @@ void MotorSet::drive(int dirL,float freqL,int dirR,float freqR)
   motorR.drive(dirR,freqR); //Right wheel
 }
 
-void MotorSet::driveCmd(Cmd cmd)
+void MotorSet::driveCmd(Cmd &cmd)
 {
-  if (cmd.type==KEEP_STATUS){
     drive(cmd.dirL,cmd.freqL,cmd.dirR,cmd.freqR);
-  }
 }

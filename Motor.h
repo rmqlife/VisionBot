@@ -14,7 +14,7 @@ public:
   Motor motorL,motorR;
   MotorSet(int,int,int,int); //initialize with 4 pins
 	void drive(int dirL,float freqL,int dirR,float freqR);
-  void driveCmd(Cmd);
+  void driveCmd(Cmd &);
 };
 
 #endif

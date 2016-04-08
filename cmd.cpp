@@ -57,8 +57,8 @@ bool Cmd::abnormalStatus(float feedbackL, float feedbackR)
     return  abnormalL || abnormalR;
 }
 
-void Cmd::updateFreq(float feedbackL,float feedbackR){
-    if (abs(millis()-timeStamp)>MAX_TOLERANT_STARTUP_MILLIS && abnormalStatus(feedbackL,feedbackR)){
+void Cmd::updateFreq(float feedbackL,float feedbackR,bool obeyFag){
+    if (obeyFag && abs(millis()-timeStamp)>MAX_TOLERANT_STARTUP_MILLIS && abnormalStatus(feedbackL,feedbackR)){
        if (!isStop()) // not stop signal
         setStop();//sets a stop signal
        else
@@ -68,5 +68,16 @@ void Cmd::updateFreq(float feedbackL,float feedbackR){
 
   freqL=feedbackFreq(rpmL,feedbackL,freqL);  
   freqR=feedbackFreq(rpmR,feedbackR,freqR);
+}
+
+void Cmd::updateDir(float feedbackDegree){
+  if (abs(degree-feedbackDegree)<5){
+    keepStatus(0,0);
+    return;
+  }
+  else if (feedbackDegree>degree)
+    keepStatus(1,-1);
+  else 
+    keepStatus(-1,1);
 }
 

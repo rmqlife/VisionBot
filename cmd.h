@@ -4,7 +4,7 @@
 #include "utility.h"
 
 class Cmd{
-
+  unsigned long timeStamp;
 public:
   Cmd(int dirL,int dirR,float rpmL,float rpmR);
 	float rpmL,rpmR; //target, not observed
@@ -12,8 +12,7 @@ public:
 	int dirL,dirR;
 	int type;
 	float degree;
-	unsigned long timeStamp;
-	void findDirection();
+  void findDirection();
 	void keepStatus(int,int);
 	void keepStatus(int code); // compressed code
 	void keepStatus(int,int,float,float);
@@ -21,6 +20,7 @@ public:
 	void setStop();
   bool isStop();
 	int getCmd(); // return -1 if no available cmd received
-  void updateFreq(float feedbackL,float feedbackR);
+  void updateFreq(float feedbackL,float feedbackR, bool obeyFag);
+  void updateDir(float feedbackDegree);
 };
 #endif

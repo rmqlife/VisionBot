@@ -5,7 +5,7 @@
 #include <Wire.h>
 #include "utility.h"
 #include "cmd.h"
-bool debug=1;
+bool show_rpm=0;
 //sensors and motors
 Tachometer speedL(2); //left
 Tachometer speedR(3); //right
@@ -16,6 +16,8 @@ GY_85 GY85;     //A5->scl A4->sda
 Cmd currentCmd(0,0,100,100);
 unsigned long timerSpeed=0;
 unsigned long timerGyro=0; 
+unsigned long timerCheck=0; 
+
 //attachInterrupt wrappers
 void tachoAdderR(){
   speedR.adder();  
@@ -53,20 +55,26 @@ float compass()
 }
 
 void loop() {
+    currentCmd.type=FIND_DIRECTION;//KEEP_STATUS;
+    currentCmd.degree=180;
+    currentCmd.freqL=1;
+    currentCmd.freqR=1;
   //get command
   if (currentCmd.getCmd() >= 0){ //legal command
     //drive motor by current command
     motorSet.driveCmd(currentCmd); 
   }
+  //measure tacho by tachometer and feedback control
   if (millis() / CIRCLE_SPEED != timerSpeed) {
     timerSpeed=millis()/CIRCLE_SPEED;
     float feedbackR = speedR.rpm();
     float feedbackL = speedL.rpm();
     //check if it is run in an abnormal way.
-    currentCmd.updateFreq(feedbackL,feedbackR);
-    motorSet.driveCmd(currentCmd);
-    
-    if (debug && (feedbackR > 0.1 || feedbackL > 0.1)) {
+    if ( currentCmd.type==KEEP_STATUS ) { 
+      currentCmd.updateFreq(feedbackL,feedbackR,true);
+      motorSet.driveCmd(currentCmd);
+    }
+    if (show_rpm && (feedbackR > 0.1 || feedbackL > 0.1)) {
       Serial.print(feedbackL);
       Serial.print("\t");
       Serial.print(feedbackR); //round per minute;
@@ -76,18 +84,33 @@ void loop() {
     speedL.reset();
   }
   
+  //gyroscope
   if (millis()/CIRCLE_GYRO != timerGyro){
       timerGyro=millis()/CIRCLE_GYRO;
+
+      // ultrasonic
       float distFront=ultrasonic.Ranging(CM);
-      if (distFront<20 && false)
+      if (distFront<20 && false){
           currentCmd.setStop();
+          motorSet.driveCmd(currentCmd);
+      }
+
+      //compass
       float d=compass();
-//      if (abs(d-180)<10)
-//      {
-//          currentCmd=4;
-//          timerCmd=millis();
-//          motorSet.drive(0,0);
-//      }
+      if (currentCmd.type==FIND_DIRECTION)
+      {
+          currentCmd.updateDir(d);
+          motorSet.driveCmd(currentCmd);
+      }
   }
+
+  if (currentCmd.type==FIND_DIRECTION && millis()/CIRCLE_CHECK != timerCheck){
+    timerCheck=millis()/CIRCLE_CHECK;
+    currentCmd.setStop();
+    motorSet.driveCmd(currentCmd);
+  }
+  
+  
+  Serial.println(currentCmd.type);
 }
 

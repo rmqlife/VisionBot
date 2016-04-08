@@ -19,12 +19,12 @@ public:
 class Cmd{
   unsigned long timeStamp;
   bool abnormalStatus(float feedbackL,float feedbackR);
-  float degree;
   float rpmL,rpmR; //target, not observed
-
+  bool turningInitFag;
 public:
 	int type;
 	MotorCmd motorCmd;
+  float degree;
 
 	//init
 	Cmd(int dirL,int dirR,float rpmL,float rpmR);
@@ -34,8 +34,10 @@ public:
 	void keepStatus(int code); // compressed code
 	void keepStatus(int,int,float,float);
 	void findDirection(float degree);
+  void turnDegree(float clockwiseDegree);
 	//change motorCmd, and maybe its time stamp
   	void updateFreq(float feedbackL,float feedbackR, bool obeyFag);
-  	void updateDir(float feedbackDegree);
+  	int updateDir(float feedbackDegree);
+    int updateTurn(float feedbackDegree);
 };
 #endif

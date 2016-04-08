@@ -65,11 +65,18 @@ void Cmd::keepStatus(int dirL,int dirR,float rpmL,float rpmR)
 int Cmd::getCmd()
 {
   if (Serial.available() > 0) {
-    // read the incoming byte:
-    int code = Serial.read() - 48;
-    if (code > -1 && code < 9) {
-		  keepStatus(code);
-	    return 0;      
+    char raw=(char)Serial.read();
+    Serial.println(raw);
+    switch(raw){
+      case 'q': keepStatus(0,0); return 0;
+      case 'f': keepStatus(1,1); return 0;
+      case 'b': keepStatus(-1,-1); return 0;
+      case 'l': turnDegree(+20); return 0;
+      case 'r': turnDegree(-20); return 0;
+      case 'n': findDirection(180); return 0;
+      case 's': findDirection(0); return 0;
+      case 'e': findDirection(270); return 0;
+      case 'w': findDirection(90); return 0;
     }
   }
   return -1;
@@ -95,7 +102,7 @@ void Cmd::updateFreq(float feedbackL,float feedbackR,bool obeyFag){
   motorCmd.freqR=feedbackFreq(rpmR,feedbackR,motorCmd.freqL);
 }
 
-void Cmd::updateDir(float feedbackDegree){
+int Cmd::updateDir(float feedbackDegree){
   float clockwiseDelta=feedbackDegree-degree;
   if (clockwiseDelta<0)
     clockwiseDelta+=360;
@@ -104,7 +111,7 @@ void Cmd::updateDir(float feedbackDegree){
   }
   if (abs(clockwiseDelta)<3){
     motorCmd.setDir(0,0);
-    return;
+    return 0;
   }
   if (clockwiseDelta>0) //clockwiseDelta is positive, clockwise turn, turn right
     motorCmd.setDir(1,-1);
@@ -112,7 +119,8 @@ void Cmd::updateDir(float feedbackDegree){
     motorCmd.setDir(-1,1);
 
   float strength=abs(clockwiseDelta)/180;
-  motorCmd.setTimeout(50*strength+50);
+  motorCmd.setTimeout(60*strength+40);
+  return 1;
 }
 
 void Cmd::findDirection(float degree)
@@ -122,4 +130,23 @@ void Cmd::findDirection(float degree)
   this->type=FIND_DIRECTION;  
 }
 
+void Cmd::turnDegree(float clockwiseDegree)
+{
+  timeStamp=millis();
+  degree=clockwiseDegree;
+  type=TURN_DEGREE;
+  //turningInitFag 
+  turningInitFag=false;
+}
 
+int Cmd::updateTurn(float feedbackDegree)
+{
+  if (!turningInitFag)
+  {
+    degree=degreeAdd(feedbackDegree,degree);  
+    turningInitFag=true;
+    return -2;
+  }
+  if ( updateDir(feedbackDegree)==0) // ready
+    keepStatus(0,0);
+}

@@ -5,7 +5,7 @@
 #include <Wire.h>
 #include "utility.h"
 #include "cmd.h"
-bool show_rpm=0;
+bool show_rpm=1;
 //sensors and motors
 Tachometer speedL(2); //left
 Tachometer speedR(3); //right
@@ -13,7 +13,7 @@ MotorSet motorSet(9,6,11,10);//(11, 10, 9, 6);
 Ultrasonic ultrasonic(4,5); // trig echo
 GY_85 GY85;     //A5->scl A4->sda
 // parameters
-Cmd currentCmd(0,0,100,100);
+Cmd currentCmd(0,0,90,90);
 unsigned long timerSpeed=0;
 unsigned long timerGyro=0; 
 unsigned long timerCheck=0; 
@@ -38,8 +38,7 @@ void setup() {
     GY85.init();
     delay(10);
     tachoStart();
-    
-    currentCmd.findDirection(compass()+10);
+//    currentCmd.findDirection(degreeAdd(compass(),-10));
 }
 
 float compass()
@@ -58,11 +57,9 @@ float compass()
 
 void loop() {
   //get command
-  if (currentCmd.getCmd() >= 0){ //legal command
-    //drive motor by current command
-    motorSet.driveCmd(currentCmd); 
-  }
-  
+  currentCmd.getCmd();
+  //drive
+  motorSet.driveCmd(currentCmd);
   //measure tacho by tachometer and feedback control
   if (millis() / CIRCLE_SPEED != timerSpeed) {
     timerSpeed=millis()/CIRCLE_SPEED;
@@ -81,7 +78,6 @@ void loop() {
     speedR.reset(); //reset the speedMeter's time circle
     speedL.reset();
   }
-  
   //gyroscope
   if (millis()/CIRCLE_GYRO != timerGyro){
       timerGyro=millis()/CIRCLE_GYRO;
@@ -93,7 +89,8 @@ void loop() {
       float d=compass();
       if (currentCmd.type==FIND_DIRECTION)
           currentCmd.updateDir(d);
+      if (currentCmd.type==TURN_DEGREE)
+          currentCmd.updateTurn(d);
   }
-  motorSet.driveCmd(currentCmd);
 }
 

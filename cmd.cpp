@@ -77,7 +77,8 @@ int Cmd::getCmd()
       case ')': keepStatus(0,-1); return 0;
       case '{': keepStatus(1,-1); return 0;
       case '}': keepStatus(-1,1); return 0;
-      
+      case 'L': tempStatus(-1,1,100); return 0;
+      case 'R': tempStatus(1,-1,100); return 0;
       case 'l': turnDegree(+20); return 0;
       case 'r': turnDegree(-20); return 0;
       case 'n': findDirection(180); return 0;
@@ -156,4 +157,13 @@ int Cmd::updateTurn(float feedbackDegree)
   }
   if ( updateDir(feedbackDegree)==0) // ready
     keepStatus(0,0);
+}
+
+void Cmd::tempStatus(int dirL,int dirR, int timeout)
+{
+  timeStamp=millis();
+  type=TEMP_STATUS;
+  motorCmd.setDir(dirL,dirR);  
+  motorCmd.setFreq(1,1);
+  motorCmd.setTimeout(timeout);
 }

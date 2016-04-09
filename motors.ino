@@ -5,7 +5,7 @@
 #include <Wire.h>
 #include "utility.h"
 #include "cmd.h"
-bool show_rpm=1;
+bool show_rpm=0;
 //sensors and motors
 Tachometer speedL(2); //left
 Tachometer speedR(3); //right

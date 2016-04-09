@@ -33,6 +33,7 @@ public:
 	void keepStatus(int,int);
 	void keepStatus(int code); // compressed code
 	void keepStatus(int,int,float,float);
+  void tempStatus(int dirL,int dirR,int timeout);
 	void findDirection(float degree);
   void turnDegree(float clockwiseDegree);
 	//change motorCmd, and maybe its time stamp

@@ -71,6 +71,13 @@ int Cmd::getCmd()
       case 'q': keepStatus(0,0); return 0;
       case 'f': keepStatus(1,1); return 0;
       case 'b': keepStatus(-1,-1); return 0;
+      case '[': keepStatus(1,0); return 0;
+      case ']': keepStatus(0,1); return 0;
+      case '(': keepStatus(-1,0); return 0;
+      case ')': keepStatus(0,-1); return 0;
+      case '{': keepStatus(1,-1); return 0;
+      case '}': keepStatus(-1,1); return 0;
+      
       case 'l': turnDegree(+20); return 0;
       case 'r': turnDegree(-20); return 0;
       case 'n': findDirection(180); return 0;
@@ -99,7 +106,7 @@ void Cmd::updateFreq(float feedbackL,float feedbackR,bool obeyFag){
        return;
     }
   motorCmd.freqL=feedbackFreq(rpmL,feedbackL,motorCmd.freqL);  
-  motorCmd.freqR=feedbackFreq(rpmR,feedbackR,motorCmd.freqL);
+  motorCmd.freqR=feedbackFreq(rpmR,feedbackR,motorCmd.freqR);
 }
 
 int Cmd::updateDir(float feedbackDegree){

@@ -13,7 +13,7 @@ MotorSet motorSet(9,6,11,10);//(11, 10, 9, 6);
 Ultrasonic ultrasonic(4,5); // trig echo
 GY_85 GY85;     //A5->scl A4->sda
 // parameters
-Cmd currentCmd(0,0,90,90);
+Cmd currentCmd(0,0,50,50);
 unsigned long timerSpeed=0;
 unsigned long timerGyro=0; 
 unsigned long timerCheck=0; 

@@ -3,7 +3,7 @@
 #include "arduino.h"
 
 #define MAX_TOLERANT_STARTUP_MILLIS 500
-#define RPM_EQUALS_STOP 50
+#define RPM_EQUALS_STOP 10
 // time circles in millisecond
 #define CIRCLE_SPEED 200
 #define CIRCLE_GYRO 100

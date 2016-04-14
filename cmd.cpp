@@ -62,12 +62,9 @@ void Cmd::keepStatus(int dirL,int dirR,float rpmL,float rpmR)
 	this->rpmR=rpmR;
 }
 
-int Cmd::getCmd()
+int Cmd::parseCmd(char raw)
 {
-  if (Serial.available() > 0) {
-    char raw=(char)Serial.read();
-    Serial.println(raw);
-    switch(raw){
+  switch(raw){
       case 'q': keepStatus(0,0); return 0;
       case 'f': keepStatus(1,1); return 0;
       case 'b': keepStatus(-1,-1); return 0;
@@ -85,7 +82,33 @@ int Cmd::getCmd()
       case 's': findDirection(0); return 0;
       case 'e': findDirection(270); return 0;
       case 'w': findDirection(90); return 0;
-    }
+  }
+  return -1;
+}
+
+
+int Cmd::getCmd()
+{
+  char raw=0;
+    if (Serial.available() > 0) {
+    raw=(char)Serial.read();
+    if (parseCmd(raw)>=0)
+      return 0;
+  }
+  if (Serial1.available() > 0) {
+    raw=(char)Serial1.read();
+    if (parseCmd(raw)>=0)
+      return 0;
+  }
+  if (Serial2.available()>0){
+    raw=(char)Serial2.read();
+    if (parseCmd(raw)>=0)
+      return 0;
+  }
+  if (Serial3.available()>0){
+    raw=(char)Serial3.read();
+    if (parseCmd(raw)>=0)
+      return 0;
   }
   return -1;
 }

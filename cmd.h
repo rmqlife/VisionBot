@@ -28,6 +28,7 @@ public:
 
 	//init
 	Cmd(int dirL,int dirR,float rpmL,float rpmR);
+  int parseCmd(char);
 	int getCmd(); // return -1 if no available cmd received
   	//set the status and time stamp, change exactly this Cmd
 	void keepStatus(int,int);

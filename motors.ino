@@ -6,11 +6,12 @@
 #include "utility.h"
 #include "cmd.h"
 bool show_rpm=0;
+bool dist_fag=1;
 //sensors and motors
 Tachometer speedL(2); //left
 Tachometer speedR(3); //right
 MotorSet motorSet(9,6,11,10);//(11, 10, 9, 6);
-Ultrasonic ultrasonic(4,5); // trig echo
+Ultrasonic ultrasonic(22,18); // trig echo
 GY_85 GY85;     //A5->scl A4->sda
 // parameters
 Cmd currentCmd(0,0,50,50);
@@ -34,6 +35,9 @@ void setup() {
     Wire.begin();
     delay(10);
     Serial.begin(9600);
+//    Serial1.begin(9600);
+    Serial2.begin(9600);
+//    Serial3.begin(9600);
     delay(10);
     GY85.init();
     delay(10);
@@ -83,7 +87,7 @@ void loop() {
       timerGyro=millis()/CIRCLE_GYRO;
       // ultrasonic
       float distFront=ultrasonic.Ranging(CM);
-      if (distFront<20 && false)
+      if (distFront<20 && dist_fag)
           currentCmd.keepStatus(0,0);
       //compass
       float d=compass();
@@ -93,4 +97,5 @@ void loop() {
           currentCmd.updateTurn(d);
   }
 }
+
 

@@ -15,7 +15,7 @@
 #define TEMP_STATUS 5
 
 #define FEEDBACK_TOLERATE 0.05 
-#define DEGREE_TOLERATE 2
+#define DEGREE_TOLERATE 5
 float feedbackFreq(float rpm,float feedback,float freq);
 
 float degreeAdd(float da,float db);

@@ -136,7 +136,7 @@ void Cmd::updateFreq(float feedbackL,float feedbackR,bool obeyFag){
 }
 
 int Cmd::updateDir(float feedbackDegree){
-  float clockwiseDelta=feedbackDegree-degree;
+  float clockwiseDelta=degree-feedbackDegree;
   // make the delta in the range [-180,+180]
   if (clockwiseDelta<-180)
     clockwiseDelta+=360;

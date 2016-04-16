@@ -100,13 +100,6 @@ void loop() {
       float distFront=ultrasonic.Ranging(CM);
       if (distFront<20 && dist_fag && currentCmd.motorCmd.isDir(1,1))
           currentCmd.keepStatus(0,0);
-
-      //compass
-      float d=compass();
-      if (currentCmd.type==FIND_DIRECTION)
-          currentCmd.updateDir(d);
-
-
       //gyroscope
       float g=gyroscope()*CIRCLE_GYRO/1000; //in Second/ in angle
       if (currentCmd.type==TURN_DEGREE)
@@ -116,6 +109,15 @@ void loop() {
         currentAngle-=360;
       if (currentAngle<-180)
         currentAngle+=360;
+
+
+      //compass
+      float d=compass();
+      if (currentCmd.type==FIND_DIRECTION)
+          currentCmd.updateDir(currentAngle);
+
+
+
   }
 }
 

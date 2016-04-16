@@ -20,7 +20,6 @@ class Cmd{
   unsigned long timeStamp;
   bool abnormalStatus(float feedbackL,float feedbackR);
   float rpmL,rpmR; //target, not observed
-  bool turningInitFag;
 public:
 	int type;
 	MotorCmd motorCmd;

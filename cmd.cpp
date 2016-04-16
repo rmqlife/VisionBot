@@ -76,12 +76,14 @@ int Cmd::parseCmd(char raw)
       case '}': keepStatus(-1,1); return 0;
       case 'L': tempStatus(-1,1,100); return 0;
       case 'R': tempStatus(1,-1,100); return 0;
-      case 'l': turnDegree(+20); return 0;
-      case 'r': turnDegree(-20); return 0;
+      case 'l': turnDegree(-30); return 0;
+      case 'r': turnDegree(30); return 0;
       case 'n': findDirection(180); return 0;
       case 's': findDirection(0); return 0;
       case 'e': findDirection(270); return 0;
       case 'w': findDirection(90); return 0;
+      case 'h': turnDegree(90); return 0; //half around
+      case 'a': turnDegree(180); return 0; //turn saround
   }
   return -1;
 }
@@ -135,12 +137,13 @@ void Cmd::updateFreq(float feedbackL,float feedbackR,bool obeyFag){
 
 int Cmd::updateDir(float feedbackDegree){
   float clockwiseDelta=feedbackDegree-degree;
-  if (clockwiseDelta<0)
+  // make the delta in the range [-180,+180]
+  if (clockwiseDelta<-180)
     clockwiseDelta+=360;
   if (clockwiseDelta>180){
     clockwiseDelta=clockwiseDelta-360;  
   }
-  if (abs(clockwiseDelta)<3){
+  if (abs(clockwiseDelta)<DEGREE_TOLERATE){
     motorCmd.setDir(0,0);
     return 0;
   }
@@ -149,8 +152,10 @@ int Cmd::updateDir(float feedbackDegree){
   else //clockwiseDelta is negative, counterclockwise turn, which means turn left
     motorCmd.setDir(-1,1);
 
-  float strength=abs(clockwiseDelta)/180;
-  motorCmd.setTimeout(60*strength+40);
+  float strength=sqrt(abs(clockwiseDelta)/180)*0.6+0.4;
+  if (strength>1)
+    strength=1;
+  motorCmd.setFreq(strength,strength);
   return 1;
 }
 
@@ -166,20 +171,32 @@ void Cmd::turnDegree(float clockwiseDegree)
   timeStamp=millis();
   degree=clockwiseDegree;
   type=TURN_DEGREE;
-  //turningInitFag 
-  turningInitFag=false;
 }
 
 int Cmd::updateTurn(float feedbackDegree)
 {
-  if (!turningInitFag)
-  {
-    degree=degreeAdd(feedbackDegree,degree);  
-    turningInitFag=true;
-    return -2;
+  float clockwiseDelta=degree-feedbackDegree;
+  
+  //no need to turn
+  if (abs(clockwiseDelta)<DEGREE_TOLERATE){
+      keepStatus(0,0);  //change to stay 
+      return 0;
   }
-  if ( updateDir(feedbackDegree)==0) // ready
-    keepStatus(0,0);
+  float strength=0.6;
+  if (strength>1)
+    strength=1;
+  
+  if (clockwiseDelta>0){ //clockwiseDelta is positive, clockwise turn, turn right
+    motorCmd.setDir(1,-1);
+  }
+  else{ //clockwiseDelta is negative, counterclockwise turn, which means turn left
+    motorCmd.setDir(-1,1);
+  }
+  
+  motorCmd.setFreq(strength,strength);
+  //change the clockwiseDelta
+  degree=clockwiseDelta;
+  return 1;
 }
 
 void Cmd::tempStatus(int dirL,int dirR, int timeout)

@@ -15,6 +15,7 @@ Ultrasonic ultrasonic(22,18); // trig echo
 GY_85 GY85;     //A5->scl A4->sda
 // parameters
 Cmd currentCmd(0,0,50,50);
+float currentAngle=0;
 unsigned long timerSpeed=0;
 unsigned long timerGyro=0; 
 unsigned long timerCheck=0; 
@@ -59,6 +60,16 @@ float compass()
     return yaw;
 }
 
+
+float gyroscope()
+{
+    float gx = GY85.gyro_x( GY85.readGyro() );
+    float gy = GY85.gyro_y( GY85.readGyro() );
+    float gz = GY85.gyro_z( GY85.readGyro() );
+    float gt = GY85.temp  ( GY85.readGyro() ); 
+    return gz;
+}
+
 void loop() {
   //get command
   currentCmd.getCmd();
@@ -82,20 +93,31 @@ void loop() {
     speedR.reset(); //reset the speedMeter's time circle
     speedL.reset();
   }
-  //gyroscope
+  //gyroscope compass and ultrasonic 
   if (millis()/CIRCLE_GYRO != timerGyro){
       timerGyro=millis()/CIRCLE_GYRO;
       // ultrasonic
       float distFront=ultrasonic.Ranging(CM);
-      if (distFront<20 && dist_fag)
+      if (distFront<20 && dist_fag && currentCmd.motorCmd.isDir(1,1))
           currentCmd.keepStatus(0,0);
+
       //compass
       float d=compass();
       if (currentCmd.type==FIND_DIRECTION)
           currentCmd.updateDir(d);
+
+
+      //gyroscope
+      float g=gyroscope()*CIRCLE_GYRO/1000; //in Second/ in angle
       if (currentCmd.type==TURN_DEGREE)
-          currentCmd.updateTurn(d);
+          currentCmd.updateTurn(g);
+      currentAngle+=g;
+      if (currentAngle>180)
+        currentAngle-=360;
+      if (currentAngle<-180)
+        currentAngle+=360;
   }
 }
+
 
 

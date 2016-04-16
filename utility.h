@@ -6,7 +6,7 @@
 #define RPM_EQUALS_STOP 10
 // time circles in millisecond
 #define CIRCLE_SPEED 200
-#define CIRCLE_GYRO 100
+#define CIRCLE_GYRO 50
 #define CIRCLE_CHECK 70
 
 #define KEEP_STATUS 2
@@ -15,7 +15,7 @@
 #define TEMP_STATUS 5
 
 #define FEEDBACK_TOLERATE 0.05 
-
+#define DEGREE_TOLERATE 2
 float feedbackFreq(float rpm,float feedback,float freq);
 
 float degreeAdd(float da,float db);

@@ -3,6 +3,7 @@
 #include "Ultrasonic.h"
 #include "GY_85.h"
 #include <Wire.h>
+#include <Servo.h>
 #include "utility.h"
 #include "cmd.h"
 bool show_rpm=0;
@@ -31,8 +32,17 @@ void tachoStart(){
     attachInterrupt(speedR.getPin()-2,tachoAdderR,RISING);
     attachInterrupt(speedL.getPin()-2,tachoAdderL,RISING);
 }
+Servo servoH,servoV;  // create servo object to control a servo
+
+
+
 //setup
 void setup() {
+    servoH.attach(5);  // attaches the servo on pin
+    servoV.attach(4);
+    servoH.write(80);
+    servoV.write(90);
+    
     Wire.begin();
     delay(10);
     Serial.begin(9600);

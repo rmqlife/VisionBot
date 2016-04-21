@@ -6,6 +6,7 @@
 #include <Servo.h>
 #include "utility.h"
 #include "cmd.h"
+#include "Arm.h"
 bool show_rpm=0;
 bool dist_fag=1;
 bool avoid_camera=0;
@@ -15,6 +16,7 @@ Tachometer speedR(3); //right
 MotorSet motorSet(9,6,11,10);//(11, 10, 9, 6);
 Ultrasonic ultrasonic(22,23); // trig echo
 GY_85 GY85;     //A5->scl A4->sda
+Arm arm(47,46);
 // parameters
 Cmd currentCmd(0,0,50,50);
 float currentAngle=0;
@@ -35,28 +37,17 @@ void tachoStart(){
     attachInterrupt(speedR.getPin()-2,tachoAdderR,RISING);
     attachInterrupt(speedL.getPin()-2,tachoAdderL,RISING);
 }
-Servo servoH,servoV;  // create servo object to control a servo
-
-
-
 //setup
 void setup() {
-    servoH.attach(47);  // attaches the servo on pin
-    servoV.attach(46);
-    servoH.write(80);
-    servoV.write(90);
-    
+//    arm.set(80,90);    
     Wire.begin();
     delay(10);
     Serial.begin(9600);
-//    Serial1.begin(9600);
     Serial2.begin(9600);
-//    Serial3.begin(9600);
     delay(10);
     GY85.init();
     delay(10);
     tachoStart();
-//    currentCmd.findDirection(degreeAdd(compass(),-10));
 }
 
 float compass()
@@ -123,17 +114,16 @@ void loop() {
       if (distFront<20 && dist_fag && currentCmd.motorCmd.isDir(1,1))
           currentCmd.keepStatus(0,0);
       
-      if (avoid_camera && millis()/CIRCLE_SERVO!= timerServo && servoDistCount>=1){
-        servoDist=servoDist/servoDistCount;
-        timerServo=millis()/CIRCLE_SERVO;
-        servoH.write(80+100*(1-sqrt(servoDist/51)));
-        servoV.write(90-90*(1-sqrt(servoDist/51)));
-        servoDist=0;
-        servoDistCount=0;
-      }else{
-        servoDist+=distFront;  
-        servoDistCount++;
-      }
+//      if (avoid_camera && millis()/CIRCLE_SERVO!= timerServo && servoDistCount>=1){
+//        servoDist=servoDist/servoDistCount;
+//        timerServo=millis()/CIRCLE_SERVO;
+//        arm.set(80+100*(1-sqrt(servoDist/51)),90-90*(1-sqrt(servoDist/51)));
+//        servoDist=0;
+//        servoDistCount=0;
+//      }else{
+//        servoDist+=distFront;  
+//        servoDistCount++;
+//      }
       //gyroscope
       float g=gyroscope()*CIRCLE_GYRO/1000; //in Second/ in angle
       if (currentCmd.type==TURN_DEGREE)

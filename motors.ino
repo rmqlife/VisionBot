@@ -12,7 +12,7 @@ bool dist_fag=1;
 Tachometer speedL(2); //left
 Tachometer speedR(3); //right
 MotorSet motorSet(9,6,11,10);//(11, 10, 9, 6);
-Ultrasonic ultrasonic(22,18); // trig echo
+Ultrasonic ultrasonic(22,23); // trig echo
 GY_85 GY85;     //A5->scl A4->sda
 // parameters
 Cmd currentCmd(0,0,50,50);
@@ -40,8 +40,8 @@ Servo servoH,servoV;  // create servo object to control a servo
 
 //setup
 void setup() {
-    servoH.attach(5);  // attaches the servo on pin
-    servoV.attach(4);
+    servoH.attach(47);  // attaches the servo on pin
+    servoV.attach(46);
     servoH.write(80);
     servoV.write(90);
     
@@ -138,9 +138,6 @@ void loop() {
       float d=compass();
       if (currentCmd.type==FIND_DIRECTION)
           currentCmd.updateDir(currentAngle);
-
-
-
   }
 }
 

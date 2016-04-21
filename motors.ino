@@ -8,6 +8,7 @@
 #include "cmd.h"
 bool show_rpm=0;
 bool dist_fag=1;
+bool avoid_camera=0;
 //sensors and motors
 Tachometer speedL(2); //left
 Tachometer speedR(3); //right
@@ -82,6 +83,15 @@ float gyroscope()
     return gz;
 }
 
+float accelerate()
+{
+    int ax = GY85.accelerometer_x( GY85.readFromAccelerometer() );
+    int ay = GY85.accelerometer_y( GY85.readFromAccelerometer() );
+    int az = GY85.accelerometer_z( GY85.readFromAccelerometer() );
+    
+}
+
+
 void loop() {
   //get command
   currentCmd.getCmd();
@@ -113,7 +123,7 @@ void loop() {
       if (distFront<20 && dist_fag && currentCmd.motorCmd.isDir(1,1))
           currentCmd.keepStatus(0,0);
       
-      if (millis()/CIRCLE_SERVO!= timerServo && servoDistCount>=1){
+      if (avoid_camera && millis()/CIRCLE_SERVO!= timerServo && servoDistCount>=1){
         servoDist=servoDist/servoDistCount;
         timerServo=millis()/CIRCLE_SERVO;
         servoH.write(80+100*(1-sqrt(servoDist/51)));

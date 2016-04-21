@@ -20,7 +20,9 @@ float currentAngle=0;
 unsigned long timerSpeed=0;
 unsigned long timerGyro=0; 
 unsigned long timerCheck=0; 
-
+unsigned long timerServo=0; 
+float servoDist=0;
+unsigned int servoDistCount=0;
 //attachInterrupt wrappers
 void tachoAdderR(){
   speedR.adder();  
@@ -110,6 +112,18 @@ void loop() {
       float distFront=ultrasonic.Ranging(CM);
       if (distFront<20 && dist_fag && currentCmd.motorCmd.isDir(1,1))
           currentCmd.keepStatus(0,0);
+      
+      if (millis()/CIRCLE_SERVO!= timerServo && servoDistCount>=1){
+        servoDist=servoDist/servoDistCount;
+        timerServo=millis()/CIRCLE_SERVO;
+        servoH.write(80+100*(1-sqrt(servoDist/51)));
+        servoV.write(90-90*(1-sqrt(servoDist/51)));
+        servoDist=0;
+        servoDistCount=0;
+      }else{
+        servoDist+=distFront;  
+        servoDistCount++;
+      }
       //gyroscope
       float g=gyroscope()*CIRCLE_GYRO/1000; //in Second/ in angle
       if (currentCmd.type==TURN_DEGREE)
@@ -119,7 +133,6 @@ void loop() {
         currentAngle-=360;
       if (currentAngle<-180)
         currentAngle+=360;
-
 
       //compass
       float d=compass();

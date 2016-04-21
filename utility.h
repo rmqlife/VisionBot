@@ -8,6 +8,7 @@
 #define CIRCLE_SPEED 200
 #define CIRCLE_GYRO 50
 #define CIRCLE_CHECK 70
+#define CIRCLE_SERVO 200
 
 #define KEEP_STATUS 2
 #define TURN_DEGREE 4

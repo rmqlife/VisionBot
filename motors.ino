@@ -9,7 +9,7 @@
 #include "Arm.h"
 bool show_rpm=0;
 bool dist_fag=1;
-bool avoid_camera=0;
+bool avoid_camera=1;
 //sensors and motors
 Tachometer speedL(2); //left
 Tachometer speedR(3); //right
@@ -39,7 +39,7 @@ void tachoStart(){
 }
 //setup
 void setup() {
-//    arm.set(80,90);    
+    arm.init(80,90);
     Wire.begin();
     delay(10);
     Serial.begin(9600);
@@ -114,16 +114,16 @@ void loop() {
       if (distFront<20 && dist_fag && currentCmd.motorCmd.isDir(1,1))
           currentCmd.keepStatus(0,0);
       
-//      if (avoid_camera && millis()/CIRCLE_SERVO!= timerServo && servoDistCount>=1){
-//        servoDist=servoDist/servoDistCount;
-//        timerServo=millis()/CIRCLE_SERVO;
-//        arm.set(80+100*(1-sqrt(servoDist/51)),90-90*(1-sqrt(servoDist/51)));
-//        servoDist=0;
-//        servoDistCount=0;
-//      }else{
-//        servoDist+=distFront;  
-//        servoDistCount++;
-//      }
+      if (avoid_camera && millis()/CIRCLE_SERVO!= timerServo && servoDistCount>=1){
+        servoDist=servoDist/servoDistCount;
+        timerServo=millis()/CIRCLE_SERVO;
+        arm.set(80+100*(1-sqrt(servoDist/51)),90-90*(1-sqrt(servoDist/51)));
+        servoDist=0;
+        servoDistCount=0;
+      }else{
+        servoDist+=distFront;  
+        servoDistCount++;
+      }
       //gyroscope
       float g=gyroscope()*CIRCLE_GYRO/1000; //in Second/ in angle
       if (currentCmd.type==TURN_DEGREE)

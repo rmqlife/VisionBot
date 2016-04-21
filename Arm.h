@@ -5,8 +5,10 @@
 class Arm{
 //horizontal, vertical
 Servo servoH,servoV;
+int pinH,pinV;
 public:
 	Arm(int pinH,int pinV);
+  void init(int valH, int valV);
 	void set(int valH,int valV);
 };
 

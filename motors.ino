@@ -79,7 +79,11 @@ float accelerate()
     int ax = GY85.accelerometer_x( GY85.readFromAccelerometer() );
     int ay = GY85.accelerometer_y( GY85.readFromAccelerometer() );
     int az = GY85.accelerometer_z( GY85.readFromAccelerometer() );
-    
+    Serial.print(ax);
+    Serial.print("\t");
+    Serial.print(ay);
+    Serial.print("\t");
+    Serial.println(az);
 }
 
 
@@ -124,6 +128,7 @@ void loop() {
         servoDist+=distFront;  
         servoDistCount++;
       }
+      
       //gyroscope
       float g=gyroscope()*CIRCLE_GYRO/1000; //in Second/ in angle
       if (currentCmd.type==TURN_DEGREE)
@@ -138,6 +143,10 @@ void loop() {
       float d=compass();
       if (currentCmd.type==FIND_DIRECTION)
           currentCmd.updateDir(currentAngle);
+
+      //accelerate
+      accelerate();
+      
   }
 }
 

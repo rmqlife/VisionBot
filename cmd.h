@@ -16,15 +16,31 @@ public:
 	bool available();
 };
 
+class ArmCmd{
+  unsigned long expireTime;
+  bool timeoutFag;
+  const byte STEP=20;
+public:
+  byte valH,valV;
+  ArmCmd(byte,byte);
+  void setVal(byte,byte);
+  inline void up(){if (valV-STEP>0) valV-=STEP; else valV=0;}
+  inline void down(){if (valV+STEP<180) valV+=STEP; else valV=180;}
+  inline void right(){if (valH-STEP>0) valH-=STEP; else valH=0;}
+  inline void left(){if (valH+STEP<180) valH+=STEP; else valH=180;}
+};
+
+
 class Cmd{
   unsigned long timeStamp;
   bool abnormalStatus(float feedbackL,float feedbackR);
   float rpmL,rpmR; //target, not observed
+  float degree;
+
 public:
 	int type;
 	MotorCmd motorCmd;
-  float degree;
-
+  ArmCmd armCmd;
 	//init
 	Cmd(int dirL,int dirR,float rpmL,float rpmR);
   int parseCmd(char);
@@ -37,8 +53,8 @@ public:
 	void findDirection(float degree);
   void turnDegree(float clockwiseDegree);
 	//change motorCmd, and maybe its time stamp
-  	void updateFreq(float feedbackL,float feedbackR, bool obeyFag);
-  	int updateDir(float feedbackDegree);
-    int updateTurn(float feedbackDegree);
+  void updateFreq(float feedbackL,float feedbackR, bool obeyFag);
+  int updateDir(float feedbackDegree);
+  int updateTurn(float feedbackDegree);
 };
 #endif

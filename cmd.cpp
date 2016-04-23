@@ -37,6 +37,17 @@ bool MotorCmd::available()
   return ( (!timeoutFag) || millis()<expireTime);
 }
 
+ArmCmd::ArmCmd(byte valH=90, byte valV=90)
+{
+  setVal(valH,valV);  
+}
+
+void ArmCmd::setVal(byte valH,byte valV)
+{
+  this->valH=valH;
+  this->valV=valV;
+}
+
 Cmd::Cmd(int dirL,int dirR,float rpmL,float rpmR)
 {
   keepStatus(dirL,dirR,rpmL,rpmR);
@@ -84,6 +95,10 @@ int Cmd::parseCmd(char raw)
       case 'w': findDirection(90); return 0;
       case 'h': turnDegree(90); return 0; //half around
       case 'a': turnDegree(180); return 0; //turn saround
+      case '1': armCmd.up(); return 0;
+      case '2': armCmd.down(); return 0;
+      case '3': armCmd.right(); return 0;
+      case '4': armCmd.left(); return 0;
   }
   return -1;
 }

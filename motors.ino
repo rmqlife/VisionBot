@@ -9,7 +9,7 @@
 #include "Arm.h"
 bool show_rpm=0;
 bool dist_fag=1;
-bool avoid_camera=1;
+bool avoid_camera=0;
 //sensors and motors
 Tachometer speedL(2); //left
 Tachometer speedR(3); //right
@@ -43,6 +43,8 @@ void setup() {
     Wire.begin();
     delay(10);
     Serial.begin(9600);
+    Serial1.begin(9600);
+    Serial3.begin(9600);
     Serial2.begin(9600);
     delay(10);
     GY85.init();
@@ -92,6 +94,7 @@ void loop() {
   currentCmd.getCmd();
   //drive
   motorSet.driveCmd(currentCmd);
+  arm.driveCmd(currentCmd);
   //measure tacho by tachometer and feedback control
   if (millis() / CIRCLE_SPEED != timerSpeed) {
     timerSpeed=millis()/CIRCLE_SPEED;
@@ -145,7 +148,7 @@ void loop() {
           currentCmd.updateDir(currentAngle);
 
       //accelerate
-      accelerate();
+//      accelerate();
       
   }
 }

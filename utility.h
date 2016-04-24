@@ -1,6 +1,6 @@
 #ifndef UTILITY_H
 #define UTITILY_H
-#include "arduino.h"
+#include "Arduino.h"
 
 #define MAX_TOLERANT_STARTUP_MILLIS 500
 #define RPM_EQUALS_STOP 10

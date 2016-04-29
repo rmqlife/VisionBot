@@ -5,7 +5,7 @@
 #include <Wire.h>
 #include <Servo.h>
 #include "utility.h"
-#include "cmd.h"
+#include "Cmd.h"
 #include "Arm.h"
 bool show_rpm=0;
 bool dist_fag=1;

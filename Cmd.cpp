@@ -1,4 +1,4 @@
-#include "cmd.h"
+#include "Cmd.h"
 MotorCmd::MotorCmd(int dirL=0,int dirR=0,float freqL=0.9,float freqR=0.9)
 {
   this->dirL=dirL;

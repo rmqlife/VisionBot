@@ -85,12 +85,12 @@ int Cmd::parseCmd(char raw)
       case ')': keepStatus(0,-1); return 0;
       case '{': keepStatus(1,-1); return 0;
       case '}': keepStatus(-1,1); return 0;
-      case 'L': tempStatus(-1,1,100); return 0;
-      case 'R': tempStatus(1,-1,100); return 0;
-      case '1': armCmd.up(); return 0;
-      case '2': armCmd.down(); return 0;
-      case '3': armCmd.right(); return 0;
-      case '4': armCmd.left(); return 0;
+      case 'l': tempStatus(-1,1,100); return 0;
+      case 'r': tempStatus(1,-1,100); return 0;
+      case 'U': armCmd.up(); return 0;
+      case 'D': armCmd.down(); return 0;
+      case 'R': armCmd.right(); return 0;
+      case 'L': armCmd.left(); return 0;
   }
   return -1;
 }

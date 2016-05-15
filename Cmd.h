@@ -19,7 +19,7 @@ public:
 class ArmCmd{
   unsigned long expireTime;
   bool timeoutFag;
-  const byte STEP=20;
+  const byte STEP=5;
 public:
   byte valH,valV;
   ArmCmd(byte,byte);

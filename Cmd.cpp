@@ -87,14 +87,6 @@ int Cmd::parseCmd(char raw)
       case '}': keepStatus(-1,1); return 0;
       case 'L': tempStatus(-1,1,100); return 0;
       case 'R': tempStatus(1,-1,100); return 0;
-      case 'l': turnDegree(-30); return 0;
-      case 'r': turnDegree(30); return 0;
-      case 'n': findDirection(180); return 0;
-      case 's': findDirection(0); return 0;
-      case 'e': findDirection(270); return 0;
-      case 'w': findDirection(90); return 0;
-      case 'h': turnDegree(90); return 0; //half around
-      case 'a': turnDegree(180); return 0; //turn saround
       case '1': armCmd.up(); return 0;
       case '2': armCmd.down(); return 0;
       case '3': armCmd.right(); return 0;

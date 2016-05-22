@@ -73,8 +73,10 @@ void Cmd::keepStatus(int dirL,int dirR,float rpmL,float rpmR)
 	this->rpmR=rpmR;
 }
 
-int Cmd::parseCmd(char raw)
+
+int Cmd::parseCmd(char s[], int len)
 {
+  char raw = s[0];
   switch(raw){
       case 'q': keepStatus(0,0); return 0;
       case 'f': keepStatus(1,1); return 0;
@@ -85,51 +87,25 @@ int Cmd::parseCmd(char raw)
       case ')': keepStatus(0,-1); return 0;
       case '{': keepStatus(1,-1); return 0;
       case '}': keepStatus(-1,1); return 0;
-      case 'L': tempStatus(-1,1,100); return 0;
-      case 'R': tempStatus(1,-1,100); return 0;
-      case 'l': turnDegree(-30); return 0;
-      case 'r': turnDegree(30); return 0;
+      case 'l': tempStatus(-1,1,100); return 0;
+      case 'r': tempStatus(1,-1,100); return 0;
+
+      case 'a': turnDegree(-30); return 0;
+      case 'd': turnDegree(30); return 0;
+
       case 'n': findDirection(180); return 0;
-      case 's': findDirection(0); return 0;
-      case 'e': findDirection(270); return 0;
-      case 'w': findDirection(90); return 0;
-      case 'h': turnDegree(90); return 0; //half around
-      case 'a': turnDegree(180); return 0; //turn saround
-      case '1': armCmd.up(); return 0;
-      case '2': armCmd.down(); return 0;
-      case '3': armCmd.right(); return 0;
-      case '4': armCmd.left(); return 0;
+      
+      case 'U': armCmd.up(); return 0;
+      case 'D': armCmd.down(); return 0;
+      case 'R': armCmd.right(); return 0;
+      case 'L': armCmd.left(); return 0;
+      
+      case 'A':
+        
+         return 0;
   }
   return -1;
 }
-
-
-int Cmd::getCmd()
-{
-  char raw=0;
-    if (Serial.available() > 0) {
-    raw=(char)Serial.read();
-    if (parseCmd(raw)>=0)
-      return 0;
-  }
-  if (Serial1.available() > 0) {
-    raw=(char)Serial1.read();
-    if (parseCmd(raw)>=0)
-      return 0;
-  }
-  if (Serial2.available()>0){
-    raw=(char)Serial2.read();
-    if (parseCmd(raw)>=0)
-      return 0;
-  }
-  if (Serial3.available()>0){
-    raw=(char)Serial3.read();
-    if (parseCmd(raw)>=0)
-      return 0;
-  }
-  return -1;
-}
-
 
 bool Cmd::abnormalStatus(float feedbackL, float feedbackR)
 {

@@ -2,6 +2,7 @@
 #define CMD_H
 #include "Arduino.h"
 #include "utility.h"
+
 class MotorCmd{
 	unsigned long expireTime;
 	bool timeoutFag;
@@ -19,7 +20,7 @@ public:
 class ArmCmd{
   unsigned long expireTime;
   bool timeoutFag;
-  const byte STEP=20;
+  const byte STEP=5;
 public:
   byte valH,valV;
   ArmCmd(byte,byte);
@@ -38,23 +39,22 @@ class Cmd{
   float degree;
 
 public:
-	int type;
-	MotorCmd motorCmd;
-  ArmCmd armCmd;
-	//init
-	Cmd(int dirL,int dirR,float rpmL,float rpmR);
-  int parseCmd(char);
-	int getCmd(); // return -1 if no available cmd received
-  	//set the status and time stamp, change exactly this Cmd
-	void keepStatus(int,int);
-	void keepStatus(int code); // compressed code
-	void keepStatus(int,int,float,float);
-  void tempStatus(int dirL,int dirR,int timeout);
-	void findDirection(float degree);
-  void turnDegree(float clockwiseDegree);
-	//change motorCmd, and maybe its time stamp
-  void updateFreq(float feedbackL,float feedbackR, bool obeyFag);
-  int updateDir(float feedbackDegree);
-  int updateTurn(float feedbackDegree);
+    int type;
+    MotorCmd motorCmd;
+    ArmCmd armCmd;
+    //init
+    Cmd(int dirL,int dirR,float rpmL,float rpmR);
+    int parseCmd(char s[],int len);
+    //set the status and time stamp, change exactly this Cmd
+    void keepStatus(int,int);
+    void keepStatus(int code); // compressed code
+    void keepStatus(int,int,float,float);
+    void tempStatus(int dirL,int dirR,int timeout);
+    void findDirection(float degree);
+    void turnDegree(float clockwiseDegree);
+    //change motorCmd, and maybe its time stamp
+    void updateFreq(float feedbackL,float feedbackR, bool obeyFag);
+    int updateDir(float feedbackDegree);
+    int updateTurn(float feedbackDegree);
 };
 #endif

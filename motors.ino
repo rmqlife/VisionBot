@@ -7,6 +7,7 @@
 #include "utility.h"
 #include "Cmd.h"
 #include "Arm.h"
+#include "Parser.h"
 bool show_rpm=0;
 bool dist_fag=1;
 bool avoid_camera=0;
@@ -19,6 +20,8 @@ GY_85 GY85;     //A5->scl A4->sda
 Arm arm(47,46);
 // parameters
 Cmd currentCmd(0,0,50,50);
+Parser parser;
+
 float currentAngle=0;
 unsigned long timerSpeed=0;
 unsigned long timerGyro=0; 
@@ -91,7 +94,8 @@ float accelerate()
 
 void loop() {
   //get command
-  currentCmd.getCmd();
+  if (parser.getSerial()>0)
+    currentCmd.parseCmd(parser.data,parser.len);
   //drive
   motorSet.driveCmd(currentCmd);
   arm.driveCmd(currentCmd);

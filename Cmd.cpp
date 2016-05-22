@@ -76,8 +76,10 @@ void Cmd::keepStatus(int dirL,int dirR,float rpmL,float rpmR)
 
 int Cmd::parseCmd(char s[], int len)
 {
-  char raw = s[0];
-  switch(raw){
+  if (len==0)
+    return -1;
+  char act = s[0];
+  switch(act){
       case 'q': keepStatus(0,0); return 0;
       case 'f': keepStatus(1,1); return 0;
       case 'b': keepStatus(-1,-1); return 0;
@@ -89,10 +91,6 @@ int Cmd::parseCmd(char s[], int len)
       case '}': keepStatus(-1,1); return 0;
       case 'l': tempStatus(-1,1,100); return 0;
       case 'r': tempStatus(1,-1,100); return 0;
-
-      case 'a': turnDegree(-30); return 0;
-      case 'd': turnDegree(30); return 0;
-
       case 'n': findDirection(180); return 0;
       
       case 'U': armCmd.up(); return 0;
@@ -100,11 +98,43 @@ int Cmd::parseCmd(char s[], int len)
       case 'R': armCmd.right(); return 0;
       case 'L': armCmd.left(); return 0;
       
+      //set arm values
       case 'A':
-        
+         if (len != 3)
+            return -1;
+         armCmd.setVal(int(s[1]), int(s[2]));                 
          return 0;
+     //set turn degree
+     case 'T':
+        if (len != 3)
+          return -1;
+        if (s[1] == 'r')
+          turnDegree(s[2]);
+        else
+          turnDegree(-s[2]);
+        return 0;
+     //set find direction
+     case 'F':
+        if (len != 3)
+          return -1;
+        if (s[1] == 'r')
+          findDirection(s[2]);
+        else
+          findDirection(-s[2]);
+        return 0;
+     //keep status
+     case 'K':
+       if (len != 3)
+          return -1;
+       keepStatus(s[1]-1,s[2]-1);
+       return 0;
+     //temp status
+     case 'E':
+       if (len != 4)
+         return -1;
+       tempStatus(s[1]-1,s[2]-1,10*s[3]);
+       return 0;
   }
-  return -1;
 }
 
 bool Cmd::abnormalStatus(float feedbackL, float feedbackR)

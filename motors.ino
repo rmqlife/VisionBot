@@ -20,7 +20,8 @@ GY_85 GY85;     //A5->scl A4->sda
 Arm arm(47,46);
 // parameters
 Cmd currentCmd(0,0,50,50);
-Parser parser;
+// command parser, starts with char(254), ends with char(255)
+Parser parser(254,255);
 
 float currentAngle=0;
 unsigned long timerSpeed=0;
